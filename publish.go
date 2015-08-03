@@ -89,6 +89,14 @@ func Publish(path string, addr string) error {
 	file.Close()
 
 	//TODO: split encrypted file into shares
+	shares, err := split(ciphertext, 7, 5)
+	for i, share := range shares {
+		file, err = os.Create(fmt.Sprintf("lavinia(tmp)/share%d", i))
+		checkError(err)
+		_, err = file.Write(share)
+		file.Close()
+		checkError(err)
+	}
 
 	//TODO: store all pieces in DHT
 

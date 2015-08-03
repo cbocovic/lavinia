@@ -1,11 +1,11 @@
 package lavinia;
 
-message StoreMessage {
+message StorePaymentMessage {
 	required string key = 1;
 	required string document = 2;
 }
 
-message FetchMessage {
+message PayMessage {
 	required string key = 1;
 }
 
@@ -19,14 +19,15 @@ message AppMessage {
 	optional FileSystemMessage msg = 2;
 
 	enum Command {
-		FETCH = 1;
-		STORE = 2;
-		MIRROR = 3;
+		STOREPMT = 1;
+		PAY = 2;
+		AUDIT = 3;
 	};
 
 	message FileSystemMessage {
 		required Command cmd = 1;
-		optional StoreMessage smsg = 2;
-		optional FetchMessage fmsg = 3;
+		optional StorePaymentMessage spmsg = 2;
+		optional PaymentMessage pmsg = 3;
+		optional AuditMessage pmsg = 4;
 	}
 }

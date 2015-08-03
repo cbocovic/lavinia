@@ -17,7 +17,9 @@ type LaviniaServer struct {
 	node *chord.ChordNode
 	fs   *fs.FileSystem
 
-	storage string
+	storage         string
+	pendingAudits   []AuditBlock
+	pendingPayments []ServerPayment
 }
 
 //error checking function
