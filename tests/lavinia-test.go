@@ -49,6 +49,11 @@ func main() {
 		fmt.Printf("Joined server: %s.\n", addr)
 	}
 	//block until receive input
+	time.Sleep(time.Second * 5)
+
+	lavinia.Retrieve("test", "test.out", "127.0.0.1:8888")
+	return
+
 Loop:
 	for {
 		var cmd string
@@ -77,6 +82,8 @@ Loop:
 				node := list[port-start]
 				fmt.Printf("\n%s", node.ShowSucc())
 			}
+		case cmd == "get":
+			lavinia.Retrieve("test", "test.out", "127.0.0.1:8888")
 		case err == io.EOF:
 			break Loop
 		}

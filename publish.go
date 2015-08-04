@@ -4,7 +4,9 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha256"
 	"fmt"
+	"github.com/cbocovic/chordFS"
 	"io"
 	"os"
 )
@@ -98,7 +100,42 @@ func Publish(path string, addr string) error {
 		checkError(err)
 	}
 
+	/*TODO:tmp: mend file
+	mended := mend(shares)
+	file, err = os.Create("lavinia(tmp)/mended")
+	checkError(err)
+	_, err = file.Write(mended)
+	checkError(err)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("saved mended.\n")
+	file.Close()
+	*/
+
 	//TODO: store all pieces in DHT
+	//choose random keys and enter them into a manifest
+	manifest := make([]byte, 7*sha256.Size)
+	for i, _ := range shares {
+		var tmpKey [sha256.Size]byte
+		shareKey := manifest[sha256.Size*i : sha256.Size*(i+1)]
+		if _, err = io.ReadFull(rand.Reader, shareKey); err != nil {
+			checkError(err)
+			return err
+		}
+		copy(tmpKey[:], shareKey)
+		fs.Store(tmpKey, fmt.Sprintf("lavinia(tmp)/share%d", i), addr)
+	}
+	file, err = os.Create("lavinia(tmp)/manifest")
+	checkError(err)
+	file.Write(manifest)
+	file.Close()
+
+	//store manifest file
+	fs.Store(sha256.Sum256([]byte("00test")), "lavinia(tmp)/manifest", addr)
+
+	//store key file
+	fs.Store(sha256.Sum256([]byte("01test")), "lavinia(tmp)/key", addr)
 
 	//TODO: craft payments and store
 

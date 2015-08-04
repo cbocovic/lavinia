@@ -5,6 +5,7 @@ import "C"
 
 import (
 	"crypto/rand"
+	"fmt"
 	"io"
 )
 
@@ -54,8 +55,10 @@ func split(document []byte, n int, k int) ([][]byte, error) {
 
 			ybytes := int2bytes(int(y))
 			out := shares[j][i+2 : i+4]
+			cout := C.CString(string(out))
 			//TODO: This probably does not work as intended...
-			C.galois_region_xor(C.CString(string(document[i:i+2])), C.CString(string(ybytes)), C.CString(string(out)), 2)
+			C.galois_region_xor(C.CString(string(document[i:i+2])), C.CString(string(ybytes)), cout, 2)
+			copy(out, []byte(C.GoString(cout)))
 		}
 	}
 
@@ -63,7 +66,69 @@ func split(document []byte, n int, k int) ([][]byte, error) {
 
 }
 
+func mend(shares [][]byte) []byte {
+	length := len(shares[0])
+	fmt.Printf("length = %d.\n", length)
+	num := len(shares)
+	document := make([]byte, length-2)
+	for i := 2; i < length-2; i += 2 {
+		//interpolate shares[][i:i+2]
+		out := document[i-2 : i]
+		out[0] = 0
+		out[1] = 0
+		//cout := C.CString(string(out))
+		cout := C.int(0)
+		fmt.Printf("Reconstructing part %d of document.\n", i)
+
+		for j := 0; j < num; j++ {
+			b := C.int(1)
+			tmp := C.int(0)
+			//fmt.Printf("share j=%d.\n", j)
+			for k := 0; k < num; k++ {
+				//fmt.Printf("looping k=%d.\n", k)
+				if k != j {
+					xk := C.int(bytes2int(shares[k][:2]))
+					//fmt.Printf("xk was %d.\n", int(xk))
+					xj := C.int(bytes2int(shares[j][:2]))
+					//fmt.Printf("xj was %d.\n", int(xj))
+					b = C.galois_single_multiply(b, xk, 16)
+					//fmt.Printf("b was %d.\n", int(b))
+					tmp = xk ^ xj
+					b = C.galois_single_divide(b, tmp, 16)
+					//fmt.Printf("b was %d.\n", int(b))
+				}
+			}
+			fmt.Printf("share piece was %x.\n", shares[j][i:i+2])
+			fmt.Printf("b was %x.\n", int2bytes(int(b)))
+			fmt.Printf("cout was: %x.\n", int2bytes(int(cout)))
+			ttmp := make([]byte, 2)
+			ctmp := C.CString(string(ttmp))
+			C.galois_w16_region_multiply(C.CString(string(shares[j][i:i+2])), b, 2, ctmp, 0)
+			fmt.Printf("ctemp is: %x.\n", []byte(C.GoString(ctmp)))
+			//C.galois_w16_region_multiply(C.CString(string(shares[j][i:i+2])), b, 2, cout, 1)
+			//fmt.Printf("cout is: %x.\n", []byte(C.GoString(cout)))
+			wootmp := bytes2int([]byte(C.GoString(ctmp)))
+			tmpint1 := C.int(wootmp)
+			cout = tmpint1 ^ cout
+			fmt.Printf("cout is: %x.\n", int2bytes(int(cout)))
+		}
+		//copy(out, []byte(C.GoString(cout)))
+		out = int2bytes(int(cout))
+		fmt.Printf("out: %x.\n", out)
+		copy(document[i-1:i], out)
+	}
+	fmt.Printf("document: %x.\n", document)
+	return document
+}
+
 func bytes2int(bytes []byte) int {
+	if len(bytes) < 2 {
+		if len(bytes) < 1 {
+			return 0
+		}
+		fmt.Printf("lol\n")
+		return int(bytes[0])
+	}
 	return int(bytes[0]) + int(bytes[1])*256
 
 }

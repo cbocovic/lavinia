@@ -1,3 +1,4 @@
 *.out
 *.pb.go
 *.swp
+*.o

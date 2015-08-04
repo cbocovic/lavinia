@@ -88,10 +88,6 @@ func (me *LaviniaServer) Message(data []byte) []byte {
 
 }
 
-func Retrieve() {
-
-}
-
 func (me *LaviniaServer) Finalize() {
 	me.fs.Finalize()
 }
