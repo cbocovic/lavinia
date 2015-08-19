@@ -9,6 +9,10 @@ message PayMessage {
 	required string key = 1;
 }
 
+message AuditMessage {
+	required string key = 1;
+}
+
 message NetworkMessage {
 	required uint32 proto = 1;
 	optional string msg = 2;
@@ -27,7 +31,7 @@ message AppMessage {
 	message FileSystemMessage {
 		required Command cmd = 1;
 		optional StorePaymentMessage spmsg = 2;
-		optional PaymentMessage pmsg = 3;
-		optional AuditMessage pmsg = 4;
+		optional PayMessage pmsg = 3;
+		optional AuditMessage amsg = 4;
 	}
 }
