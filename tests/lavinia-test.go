@@ -29,13 +29,13 @@ func main() {
 
 		me := new(lavinia.LaviniaServer)
 		startaddr = fmt.Sprintf("127.0.0.1:%d", start)
-		me = lavinia.Create(fmt.Sprintf("/home/bocovich/FS/%d/", start), startaddr)
+		me = lavinia.Create(fmt.Sprintf("/home/bocovich/FS/%d", start), startaddr)
 		list[0] = me
 		lavinia.Publish("/home/bocovich/out", "127.0.0.1:8888")
 	} else {
 		me := new(lavinia.LaviniaServer)
 		startaddr = fmt.Sprintf("127.0.0.1:%d", start)
-		me = lavinia.Join(fmt.Sprintf("/home/bocovich/FS/%d/", start), startaddr, "127.0.0.1:8888")
+		me = lavinia.Join(fmt.Sprintf("/home/bocovich/FS/%d", start), startaddr, "127.0.0.1:8888")
 		list[0] = me
 	}
 
@@ -44,7 +44,7 @@ func main() {
 		time.Sleep(time.Second)
 
 		addr := fmt.Sprintf("127.0.0.1:%d", start+i)
-		node := lavinia.Join(fmt.Sprintf("/home/bocovich/FS/%d/", start+i), addr, startaddr)
+		node := lavinia.Join(fmt.Sprintf("/home/bocovich/FS/%d", start+i), addr, startaddr)
 		list[i] = node
 		fmt.Printf("Joined server: %s.\n", addr)
 	}

@@ -71,7 +71,8 @@ func mend(shares [][]byte) []byte {
 	fmt.Printf("length = %d.\n", length)
 	num := len(shares)
 	document := make([]byte, length-2)
-	for i := 2; i < length-2; i += 2 {
+	//TODO: for testing only, reset constraint to length-2
+	for i := 2; i < (length-2)/16; i += 2 {
 		//interpolate shares[][i:i+2]
 		out := document[i-2 : i]
 		out[0] = 0
@@ -81,21 +82,24 @@ func mend(shares [][]byte) []byte {
 		fmt.Printf("Reconstructing part %d of document.\n", i)
 
 		for j := 0; j < num; j++ {
+			fmt.Printf("share piece was %x.\n", shares[j][i:i+2])
 			b := C.int(1)
+			fmt.Printf("b is initially %x.\n", int2bytes(int(b)))
 			tmp := C.int(0)
-			//fmt.Printf("share j=%d.\n", j)
+			fmt.Printf("tmp is initially %x.\n", int2bytes(int(tmp)))
+			fmt.Printf("share j=%d.\n", j)
 			for k := 0; k < num; k++ {
-				//fmt.Printf("looping k=%d.\n", k)
+				fmt.Printf("looping k=%d.\n", k)
 				if k != j {
 					xk := C.int(bytes2int(shares[k][:2]))
-					//fmt.Printf("xk was %d.\n", int(xk))
+					fmt.Printf("xk was %d.\n", int(xk))
 					xj := C.int(bytes2int(shares[j][:2]))
-					//fmt.Printf("xj was %d.\n", int(xj))
+					fmt.Printf("xj was %d.\n", int(xj))
 					b = C.galois_single_multiply(b, xk, 16)
-					//fmt.Printf("b was %d.\n", int(b))
+					fmt.Printf("b was %d.\n", int(b))
 					tmp = xk ^ xj
 					b = C.galois_single_divide(b, tmp, 16)
-					//fmt.Printf("b was %d.\n", int(b))
+					fmt.Printf("b was %d.\n", int(b))
 				}
 			}
 			fmt.Printf("share piece was %x.\n", shares[j][i:i+2])
