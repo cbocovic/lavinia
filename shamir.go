@@ -78,7 +78,7 @@ func mend(shares [][]byte) []byte {
 		out[1] = 0
 		//cout := C.CString(string(out))
 		cout := C.int(0)
-		fmt.Printf("Reconstructing part %d of document.\n", i)
+		//fmt.Printf("Reconstructing part %d of document.\n", i)
 
 		for j := 0; j < num; j++ {
 			b := C.int(1)
@@ -98,23 +98,23 @@ func mend(shares [][]byte) []byte {
 					//fmt.Printf("b was %d.\n", int(b))
 				}
 			}
-			fmt.Printf("share piece was %x.\n", shares[j][i:i+2])
-			fmt.Printf("b was %x.\n", int2bytes(int(b)))
-			fmt.Printf("cout was: %x.\n", int2bytes(int(cout)))
+			//fmt.Printf("share piece was %x.\n", shares[j][i:i+2])
+			//fmt.Printf("b was %x.\n", int2bytes(int(b)))
+			//fmt.Printf("cout was: %x.\n", int2bytes(int(cout)))
 			ttmp := make([]byte, 2)
 			ctmp := C.CString(string(ttmp))
 			C.galois_w16_region_multiply(C.CString(string(shares[j][i:i+2])), b, 2, ctmp, 0)
-			fmt.Printf("ctemp is: %x.\n", []byte(C.GoString(ctmp)))
+			//fmt.Printf("ctemp is: %x.\n", []byte(C.GoString(ctmp)))
 			//C.galois_w16_region_multiply(C.CString(string(shares[j][i:i+2])), b, 2, cout, 1)
 			//fmt.Printf("cout is: %x.\n", []byte(C.GoString(cout)))
 			wootmp := bytes2int([]byte(C.GoString(ctmp)))
 			tmpint1 := C.int(wootmp)
 			cout = tmpint1 ^ cout
-			fmt.Printf("cout is: %x.\n", int2bytes(int(cout)))
+			//fmt.Printf("cout is: %x.\n", int2bytes(int(cout)))
 		}
 		//copy(out, []byte(C.GoString(cout)))
 		out = int2bytes(int(cout))
-		fmt.Printf("out: %x.\n", out)
+		//fmt.Printf("out: %x.\n", out)
 		copy(document[i-1:i], out)
 	}
 	fmt.Printf("document: %x.\n", document)
@@ -126,7 +126,6 @@ func bytes2int(bytes []byte) int {
 		if len(bytes) < 1 {
 			return 0
 		}
-		fmt.Printf("lol\n")
 		return int(bytes[0])
 	}
 	return int(bytes[0]) + int(bytes[1])*256
