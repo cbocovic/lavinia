@@ -77,7 +77,7 @@ func Join(home string, myaddr string, addr string) *LaviniaServer {
 	return me
 }
 
-func (me *LaviniaServer) Notify(id [sha256.Size]byte, myid [sha256.Size]byte) {
+func (me *LaviniaServer) Notify(id [sha256.Size]byte, myid [sha256.Size]byte, addr string) {
 	//TODO: forward payment info to new node
 
 }

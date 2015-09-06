@@ -24,7 +24,7 @@ func Retrieve(keyword string, path string, addr string) error {
 		return err
 	}
 
-	key = sha256.Sum256([]byte("00" + keyword))
+	key = sha256.Sum256([]byte("01" + keyword))
 	err = fs.Fetch(key, "lavinia2(tmp)/key", addr)
 	checkError(err)
 	if err != nil {
@@ -74,7 +74,7 @@ func Retrieve(keyword string, path string, addr string) error {
 
 	fmt.Printf("Length of share 0 is %d.\n", len(shares[0]))
 	mended := mend(shares)
-	file, err = os.Create("lavinia(tmp)/mended")
+	file, err = os.Create("lavinia2(tmp)/mended")
 	checkError(err)
 	_, err = file.Write(mended)
 	checkError(err)
