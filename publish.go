@@ -139,6 +139,9 @@ func Publish(path string, addr string) error {
 
 	//TODO: craft payments and store
 
+	//remove temporary directory
+	os.RemoveAll("lavinia(tmp)")
+
 	return nil
 }
 

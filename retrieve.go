@@ -116,7 +116,19 @@ func Retrieve(keyword string, path string, addr string) error {
 
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(plaintext, ciphertext)
-	fmt.Printf("%s\n", plaintext)
+
+	file, err = os.Create(path)
+	checkError(err)
+	for i, b := range plaintext {
+		if b != 0 {
+			file.Seek(0, 0)
+			file.Write(plaintext[:i])
+		}
+	}
+	file.Close()
+
+	//remove temporary directory
+	os.RemoveAll("lavinia2(tmp)")
 
 	return nil
 
