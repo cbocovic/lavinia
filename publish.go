@@ -37,8 +37,8 @@ func Publish(path string, addr string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("saved key.\n")
 	file.Close()
+	fmt.Printf("Wrote key: %x.\n", key)
 
 	//read in plaintext
 	file, err = os.Open(path)

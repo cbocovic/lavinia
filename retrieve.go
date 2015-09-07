@@ -1,6 +1,8 @@
 package lavinia
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/sha256"
 	"fmt"
 	"github.com/cbocovic/chordFS"
@@ -85,6 +87,36 @@ func Retrieve(keyword string, path string, addr string) error {
 	file.Close()
 
 	//TODO: decrypt file
+	file, err = os.Open("lavinia2(tmp)/key")
+	checkError(err)
+	aesKey := make([]byte, 32)
+	_, err = file.Read(aesKey)
+	checkError(err)
+	if err != nil {
+		return err
+	}
+	file.Close()
+
+	fmt.Printf("Read in key: %x.\n", aesKey)
+
+	block, err := aes.NewCipher(aesKey)
+	if err != nil {
+		checkError(err)
+		return err
+	}
+
+	ciphertext := mended
+	plaintext := make([]byte, len(ciphertext)-aes.BlockSize)
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	if len(ciphertext)%aes.BlockSize != 0 {
+		panic("ciphertext not a multiple of block size.\n")
+	}
+
+	mode := cipher.NewCBCDecrypter(block, iv)
+	mode.CryptBlocks(plaintext, ciphertext)
+	fmt.Printf("%s\n", plaintext)
 
 	return nil
 
